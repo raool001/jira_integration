@@ -10,29 +10,9 @@ jobs:
     if: github.event.action == 'opened' || github.event.action == 'reopened'
     runs-on: ubuntu-latest
     steps:
-      - name: Login to Jira
-        uses: atlassian/gajira-login@v3
-        env:
-          JIRA_BASE_URL:   ${{ secrets.JIRA_BASE_URL }}
-          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
-          JIRA_API_TOKEN:  ${{ secrets.JIRA_API_TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Find Jira issue key in branch name
-        id: find-issue
-        uses: atlassian/gajira-find-issue-key@v3
-        with:
-          from: branch
-
-      - name: Transition to In Progress
-        uses: atlassian/gajira-transition@v3
-        with:
-          issue:      ${{ steps.find-issue.outputs.issue }}
-          transition: "In Progress"
-
-  transition-on-merge:
-    if: github.event.action == 'closed' && github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    steps:
       - name: Login to Jira
         uses: atlassian/gajira-login@v3
         env:
@@ -44,7 +24,41 @@ jobs:
         id: find-issue
         uses: atlassian/gajira-find-issue-key@v3
         with:
-          from: branch
+          from: all
+          string: ${{ github.head_ref }}
+
+      - name: Print found issue
+        run: echo "Issue found = ${{ steps.find-issue.outputs.issue }}"
+
+      - name: Transition to In Progress
+        uses: atlassian/gajira-transition@v3
+        with:
+          issue:      ${{ steps.find-issue.outputs.issue }}
+          transition: "In Progress"
+
+  transition-on-merge:
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Jira
+        uses: atlassian/gajira-login@v3
+        env:
+          JIRA_BASE_URL:   ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN:  ${{ secrets.JIRA_API_TOKEN }}
+
+      - name: Find Jira issue key
+        id: find-issue
+        uses: atlassian/gajira-find-issue-key@v3
+        with:
+          from: all
+          string: ${{ github.head_ref }}
+
+      - name: Print found issue
+        run: echo "Issue found = ${{ steps.find-issue.outputs.issue }}"
 
       - name: Transition to Done
         uses: atlassian/gajira-transition@v3
