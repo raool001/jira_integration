@@ -20,20 +20,10 @@ jobs:
           JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
           JIRA_API_TOKEN:  ${{ secrets.JIRA_API_TOKEN }}
 
-      - name: Find Jira issue key
-        id: find-issue
-        uses: atlassian/gajira-find-issue-key@v3
-        with:
-          from: all
-          string: ${{ github.head_ref }}
-
-      - name: Print found issue
-        run: echo "Issue found = ${{ steps.find-issue.outputs.issue }}"
-
-      - name: Transition to In Progress
+      - name: Transition KAN-1 to In Progress
         uses: atlassian/gajira-transition@v3
         with:
-          issue:      ${{ steps.find-issue.outputs.issue }}
+          issue:      KAN-1
           transition: "In Progress"
 
   transition-on-merge:
@@ -50,18 +40,8 @@ jobs:
           JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
           JIRA_API_TOKEN:  ${{ secrets.JIRA_API_TOKEN }}
 
-      - name: Find Jira issue key
-        id: find-issue
-        uses: atlassian/gajira-find-issue-key@v3
-        with:
-          from: all
-          string: ${{ github.head_ref }}
-
-      - name: Print found issue
-        run: echo "Issue found = ${{ steps.find-issue.outputs.issue }}"
-
-      - name: Transition to Done
+      - name: Transition KAN-1 to Done
         uses: atlassian/gajira-transition@v3
         with:
-          issue:      ${{ steps.find-issue.outputs.issue }}
+          issue:      KAN-1
           transition: "Done"
